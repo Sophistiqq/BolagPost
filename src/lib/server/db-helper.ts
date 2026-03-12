@@ -7,21 +7,18 @@ export class Database {
 
     return {
       get: async (...params: any[]) => {
-        const sql = getDb();
-        const results = await sql.unsafe(pgQuery, params);
+        const results = await getDb().unsafe(pgQuery, params);
         return results[0] || null;
       },
       all: async (...params: any[]) => {
-        const sql = getDb();
-        return await sql.unsafe(pgQuery, params);
+        return await getDb().unsafe(pgQuery, params);
       },
       run: async (...params: any[]) => {
-        const sql = getDb();
         let finalQuery = pgQuery;
         if (pgQuery.trim().toUpperCase().startsWith('INSERT') && !pgQuery.toUpperCase().includes('RETURNING')) {
           finalQuery += ' RETURNING id';
         }
-        const result = await sql.unsafe(finalQuery, params);
+        const result = await getDb().unsafe(finalQuery, params);
         return {
           lastInsertRowid: result?.[0]?.id || 0,
           changes: result.length
@@ -31,8 +28,7 @@ export class Database {
   }
 
   async exec(sql: string) {
-    const db = getDb();
-    await db.unsafe(sql, []);
+    await getDb().unsafe(sql, []);
   }
 }
 
