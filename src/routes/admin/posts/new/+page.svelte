@@ -145,7 +145,7 @@
       </div>
 
       <div class="field">
-        <label>Content</label>
+        <p class="label-like">Content</p>
         <RichEditor onchange={(html) => (content = html)} />
         <input type="hidden" name="content" value={content} />
       </div>
@@ -210,6 +210,7 @@
       <div class="sidebar-card card">
         <h3>Tags</h3>
         <div class="field">
+          <label for="tags">Tags</label>
           <input
             id="tags"
             name="tags"
@@ -303,7 +304,7 @@
     gap: 0.4rem;
   }
 
-  label {
+  label, .label-like {
     font-size: 0.75rem;
     font-weight: 500;
     letter-spacing: 0.08em;
@@ -312,6 +313,7 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    margin: 0;
   }
 
   .label-hint {
@@ -329,7 +331,6 @@
   }
 
   input[type="text"],
-  input[type="email"],
   select {
     display: block;
     width: 100%;
@@ -344,7 +345,6 @@
     transition: border-color 0.15s;
   }
   input[type="text"]:focus,
-  input[type="email"]:focus,
   select:focus {
     border-color: #c9a84c;
   }

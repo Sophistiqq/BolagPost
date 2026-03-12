@@ -1,4 +1,4 @@
-import { getDb } from '$lib/server/db-helper';
+import { getDb } from '$lib/server/db';
 
 function calculateReadingTime(content: string): number {
   const wordsPerMinute = 200;

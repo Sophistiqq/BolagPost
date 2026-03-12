@@ -13,7 +13,7 @@
 
   let element: HTMLDivElement;
   let bubbleMenuElement: HTMLDivElement;
-  let editor: Editor;
+  let editor = $state<Editor>();
   let imageInput: HTMLInputElement;
   let isInitialized = false;
 
@@ -55,20 +55,20 @@
   onDestroy(() => editor?.destroy());
 
   // Command wrappers
-  function toggleBold() { editor.chain().focus().toggleBold().run(); }
-  function toggleItalic() { editor.chain().focus().toggleItalic().run(); }
-  function toggleH2() { editor.chain().focus().toggleHeading({ level: 2 }).run(); }
-  function toggleH3() { editor.chain().focus().toggleHeading({ level: 3 }).run(); }
-  function toggleBullet() { editor.chain().focus().toggleBulletList().run(); }
-  function toggleOrdered() { editor.chain().focus().toggleOrderedList().run(); }
-  function toggleBlockquote() { editor.chain().focus().toggleBlockquote().run(); }
-  function toggleCode() { editor.chain().focus().toggleCodeBlock().run(); }
-  function undo() { editor.chain().focus().undo().run(); }
-  function redo() { editor.chain().focus().redo().run(); }
+  function toggleBold() { editor?.chain().focus().toggleBold().run(); }
+  function toggleItalic() { editor?.chain().focus().toggleItalic().run(); }
+  function toggleH2() { editor?.chain().focus().toggleHeading({ level: 2 }).run(); }
+  function toggleH3() { editor?.chain().focus().toggleHeading({ level: 3 }).run(); }
+  function toggleBullet() { editor?.chain().focus().toggleBulletList().run(); }
+  function toggleOrdered() { editor?.chain().focus().toggleOrderedList().run(); }
+  function toggleBlockquote() { editor?.chain().focus().toggleBlockquote().run(); }
+  function toggleCode() { editor?.chain().focus().toggleCodeBlock().run(); }
+  function undo() { editor?.chain().focus().undo().run(); }
+  function redo() { editor?.chain().focus().redo().run(); }
   
   function addImage() {
     const url = prompt('Enter image URL:');
-    if (url) editor.chain().focus().setImage({ src: url }).run();
+    if (url) editor?.chain().focus().setImage({ src: url }).run();
   }
   
   function uploadImage() { imageInput?.click(); }
@@ -80,7 +80,7 @@
       const reader = new FileReader();
       reader.onload = (event) => {
         const src = event.target?.result as string;
-        editor.chain().focus().setImage({ src }).run();
+        editor?.chain().focus().setImage({ src }).run();
       };
       reader.readAsDataURL(file);
     }

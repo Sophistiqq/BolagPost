@@ -4,19 +4,27 @@
 
   let { data, form } = $props<{ data: { post: any }; form?: any }>();
 
-  let title = $state(data.post.title);
-  let slug = $state(data.post.slug);
-  let content = $state(data.post.content);
-  let excerpt = $state(data.post.excerpt || "");
+  let title = $state("");
+  let slug = $state("");
+  let content = $state("");
+  let excerpt = $state("");
   let tags = $state("");
-  let status = $state(data.post.status);
-  let imagePreview = $state<string | null>(data.post.featured_image || null);
+  let status = $state("draft");
+  let imagePreview = $state<string | null>(null);
   let isImageModalOpen = $state(false);
 
-  // Load tags from data
+  // Initialize from data once
   $effect(() => {
-    if (data.post.tags) {
-      tags = data.post.tags.map((t: any) => t.name).join(", ");
+    if (data.post) {
+        title = data.post.title;
+        slug = data.post.slug;
+        content = data.post.content;
+        excerpt = data.post.excerpt || "";
+        status = data.post.status;
+        imagePreview = data.post.featured_image || null;
+        if (data.post.tags) {
+            tags = data.post.tags.map((t: any) => t.name).join(", ");
+        }
     }
   });
 
@@ -135,7 +143,7 @@
       </div>
 
       <div class="field">
-        <label>Content</label>
+        <p class="label-like">Content</p>
         <RichEditor {content} onchange={(html) => (content = html)} />
         <input type="hidden" name="content" value={content} />
       </div>
@@ -198,6 +206,7 @@
       <div class="sidebar-card card">
         <h3>Tags</h3>
         <div class="field">
+          <label for="tags">Tags</label>
           <input
             id="tags"
             name="tags"
@@ -304,12 +313,13 @@
     gap: 0.4rem;
   }
 
-  label {
+  label, .label-like {
     font-size: 0.75rem;
     font-weight: 500;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: #8a7e6a;
+    margin: 0;
   }
 
   .field-hint {
