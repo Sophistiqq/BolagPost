@@ -5,11 +5,11 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	resolve: {
 		alias: {
-			// Mock ws to prevent bundling issues on Vercel
-			ws: '/src/lib/server/ws-mock.ts'
+			// Mock ws for client-side to prevent bundling issues
+			ws: './src/lib/server/ws-mock.ts'
 		}
 	},
 	ssr: {
-		noExternal: ['@libsql/client']
+		noExternal: ['@libsql/client', 'ws', '@libsql/isomorphic-ws']
 	}
 });
