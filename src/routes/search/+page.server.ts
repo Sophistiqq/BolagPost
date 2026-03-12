@@ -1,4 +1,4 @@
-import db from '$lib/server/db';
+import db from '$lib/server/db-helper';
 
 function calculateReadingTime(content: string): number {
   const wordsPerMinute = 200;
@@ -13,7 +13,7 @@ export const load = async ({ url }) => {
   let posts: any[] = [];
   
   if (query) {
-    posts = db.prepare(`
+    posts = await db.prepare(`
       SELECT p.id, p.title, p.slug, p.excerpt, p.featured_image, p.content, p.created_at, p.published_at, u.username as author
       FROM post p
       JOIN user u ON p.user_id = u.id
@@ -23,8 +23,8 @@ export const load = async ({ url }) => {
     `).all(`%${query}%`, `%${query}%`, `%${query}%`);
   }
 
-  const postsWithTags = posts.map(post => {
-    const tags: any[] = db.prepare(`
+  const postsWithTags = await Promise.all(posts.map(async (post) => {
+    const tags: any[] = await db.prepare(`
       SELECT t.name, t.slug FROM tag t
       JOIN post_tag pt ON t.id = pt.tag_id
       WHERE pt.post_id = ?
@@ -41,7 +41,7 @@ export const load = async ({ url }) => {
       readingTime: calculateReadingTime(post.content),
       tags
     };
-  });
+  }));
 
   return {
     query,

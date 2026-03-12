@@ -57,7 +57,7 @@
     {:else}
       <div class="post-list">
         {#each data.recentPosts as post}
-          {@const p = post as Post}
+          {@const p = post as unknown as Post}
           <div class="post-row">
             <div class="post-info">
               <span class="post-title">{p.title}</span>
@@ -248,5 +248,29 @@
   }
   .empty a:hover {
     text-decoration: underline;
+  }
+  @media (max-width: 900px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .page-header h1 {
+      font-size: 1.5rem;
+    }
+
+    .post-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .post-actions {
+      width: 100%;
+      border-top: 1px solid #f0ece4;
+      padding-top: 0.75rem;
+      justify-content: flex-start;
+    }
   }
 </style>

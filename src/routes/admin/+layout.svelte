@@ -10,6 +10,18 @@
     { href: "/admin/posts/new", label: "New Post", icon: "+" },
     { href: "/admin/profile", label: "Profile", icon: "◎" },
   ];
+
+  let isSidebarOpen = $state(false);
+
+  function toggleSidebar() {
+    isSidebarOpen = !isSidebarOpen;
+  }
+
+  // Close sidebar on navigation
+  $effect(() => {
+    const _path = $page.url.pathname;
+    isSidebarOpen = false;
+  });
 </script>
 
 <svelte:head>
@@ -21,7 +33,24 @@
 </svelte:head>
 
 <div class="shell">
-  <aside class="sidebar">
+  <header class="mobile-header">
+    <button class="hamburger" onclick={toggleSidebar} aria-label="Toggle menu">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+    <a href="/" class="brand-mobile">
+      <span class="star">✦</span>
+      <span class="brand-name">My Blog</span>
+    </a>
+    <div class="mobile-spacer"></div>
+  </header>
+
+  {#if isSidebarOpen}
+    <button class="overlay" onclick={toggleSidebar} aria-label="Close menu"></button>
+  {/if}
+
+  <aside class="sidebar" class:open={isSidebarOpen}>
     <a href="/" class="brand">
       <span class="star">✦</span>
       <span class="brand-name">My Blog</span>
@@ -63,12 +92,84 @@
     padding: 0;
   }
 
+  :global(body) {
+    overflow-x: hidden;
+  }
+
   .shell {
     display: flex;
     min-height: 100vh;
     background: #f7f4ef;
     color: #1a1814;
     font-family: "DM Sans", sans-serif;
+  }
+
+  .mobile-header {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: #1a1814;
+    color: #f0e8d8;
+    z-index: 100;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  .hamburger {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 10px;
+  }
+
+  .bar {
+    width: 20px;
+    height: 2px;
+    background: #c9a84c;
+    border-radius: 2px;
+  }
+
+  .brand-mobile {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+  }
+
+  .brand-mobile .star {
+    color: #c9a84c;
+    font-size: 1rem;
+  }
+
+  .brand-mobile .brand-name {
+    font-family: "Fraunces", serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #f0e8d8;
+  }
+
+  .mobile-spacer {
+    width: 40px; /* To balance the hamburger button */
+  }
+
+  .overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 140;
+    backdrop-filter: blur(2px);
   }
 
   .sidebar {
@@ -82,6 +183,8 @@
     position: sticky;
     top: 0;
     height: 100vh;
+    z-index: 150;
+    transition: transform 0.3s ease;
   }
 
   .brand {
@@ -198,6 +301,36 @@
     flex: 1;
     padding: 3rem;
     overflow-y: auto;
-    max-width: 960px;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .mobile-header {
+      display: flex;
+    }
+
+    .overlay {
+      display: block;
+    }
+
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      transform: translateX(-100%);
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .content {
+      padding: 5rem 1.5rem 3rem;
+    }
+
+    .brand {
+      display: none;
+    }
   }
 </style>

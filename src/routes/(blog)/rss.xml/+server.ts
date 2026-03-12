@@ -1,7 +1,7 @@
-import db from '$lib/server/db';
+import db from '$lib/server/db-helper';
 
 export async function GET() {
-  const posts: any[] = db.prepare(`
+  const posts: any[] = await db.prepare(`
     SELECT p.id, p.title, p.slug, p.excerpt, p.content, p.created_at, p.published_at, u.username as author
     FROM post p
     JOIN user u ON p.user_id = u.id

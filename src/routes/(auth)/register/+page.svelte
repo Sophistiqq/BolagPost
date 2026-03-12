@@ -197,4 +197,12 @@
   .footer-link a:hover {
     text-decoration: underline;
   }
+  @media (max-width: 480px) {
+    .card {
+      padding: 2rem 1.5rem;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+    }
+  }
 </style>

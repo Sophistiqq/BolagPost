@@ -12,6 +12,7 @@
   let status = $state("draft");
   let autoSlug = $state(true);
   let imagePreview = $state<string | null>(null);
+  let isImageModalOpen = $state(false);
 
   function generateSlug(str: string) {
     return str
@@ -43,9 +44,36 @@
       reader.readAsDataURL(file);
     }
   }
+
+  function openImageModal() {
+    if (imagePreview) isImageModalOpen = true;
+  }
+
+  function closeImageModal() {
+    isImageModalOpen = false;
+  }
 </script>
 
 <svelte:head><title>New Post — Admin</title></svelte:head>
+
+{#if isImageModalOpen}
+  <div
+    class="modal-overlay"
+    onclick={closeImageModal}
+    onkeydown={(e) => e.key === "Escape" && closeImageModal()}
+    role="button"
+    tabindex="0"
+  >
+    <div
+      class="modal-content"
+      onclick={(e) => e.stopPropagation()}
+      role="presentation"
+    >
+      <img src={imagePreview} alt="Full preview" />
+      <button class="modal-close" onclick={closeImageModal}>&times;</button>
+    </div>
+  </div>
+{/if}
 
 <div class="editor-page">
   <header class="page-header">
@@ -72,7 +100,7 @@
     }}
     enctype="multipart/form-data"
   >
-    <div class="main-content">
+    <div class="main-content card">
       <div class="field">
         <label for="title">Title</label>
         <input
@@ -111,7 +139,9 @@
           placeholder="Brief summary for homepage..."
           value={excerpt}
         />
-        <span class="field-hint">Optional. Auto-generated from content if empty.</span>
+        <span class="field-hint"
+          >Optional. Auto-generated from content if empty.</span
+        >
       </div>
 
       <div class="field">
@@ -122,7 +152,7 @@
     </div>
 
     <aside class="sidebar">
-      <div class="sidebar-card">
+      <div class="sidebar-card card">
         <h3>Publish</h3>
         <div class="field">
           <label for="status">Status</label>
@@ -132,11 +162,11 @@
           </select>
         </div>
         <button type="submit" class="btn-primary">
-          {status === 'published' ? 'Publish' : 'Save Draft'} →
+          {status === "published" ? "Publish" : "Save Draft"} →
         </button>
       </div>
 
-      <div class="sidebar-card">
+      <div class="sidebar-card card">
         <h3>Featured Image</h3>
         <div class="field">
           <label for="featured_image" class="file-label">
@@ -152,19 +182,32 @@
           </label>
           <span class="field-hint">JPEG, PNG, GIF, or WebP. Max 5MB.</span>
           {#if imagePreview}
-            <div class="image-preview">
-              <img src={imagePreview} alt="Preview" />
-              <button type="button" class="remove-image" onclick={() => {
-                imagePreview = null;
-                const input = document.getElementById('featured_image') as HTMLInputElement;
-                if (input) input.value = '';
-              }}>Remove</button>
+            <div class="image-preview-wrap">
+              <button
+                type="button"
+                class="image-preview"
+                onclick={openImageModal}
+                title="Click to enlarge"
+              >
+                <img src={imagePreview} alt="Preview" />
+              </button>
+              <button
+                type="button"
+                class="remove-image"
+                onclick={() => {
+                  imagePreview = null;
+                  const input = document.getElementById(
+                    "featured_image",
+                  ) as HTMLInputElement;
+                  if (input) input.value = "";
+                }}>Remove</button
+              >
             </div>
           {/if}
         </div>
       </div>
 
-      <div class="sidebar-card">
+      <div class="sidebar-card card">
         <h3>Tags</h3>
         <div class="field">
           <input
@@ -220,12 +263,20 @@
     align-items: flex-start;
   }
 
+  .card {
+    background: #fff;
+    border: 1px solid #e8e0d0;
+    border-radius: 6px;
+    padding: 1.5rem;
+  }
+
   .main-content {
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    width: 100%;
   }
 
   .sidebar {
@@ -234,13 +285,6 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-  }
-
-  .sidebar-card {
-    background: #fff;
-    border: 1px solid #e8e0d0;
-    border-radius: 6px;
-    padding: 1.25rem;
   }
 
   .sidebar-card h3 {
@@ -287,6 +331,8 @@
   input[type="text"],
   input[type="email"],
   select {
+    display: block;
+    width: 100%;
     background: #fff;
     border: 1px solid #e8e0d0;
     border-radius: 4px;
@@ -296,7 +342,6 @@
     color: #1a1814;
     outline: none;
     transition: border-color 0.15s;
-    width: 100%;
   }
   input[type="text"]:focus,
   input[type="email"]:focus,
@@ -338,20 +383,35 @@
     border-style: solid;
   }
 
-  .image-preview {
+  .image-preview-wrap {
     margin-top: 0.75rem;
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .image-preview {
+    background: none;
+    border: 1px solid #e8e0d0;
+    padding: 0;
+    cursor: zoom-in;
+    border-radius: 4px;
+    overflow: hidden;
+    width: 100%;
+    max-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .image-preview img {
     width: 100%;
-    height: auto;
-    border-radius: 4px;
-    border: 1px solid #e8e0d0;
+    height: 120px;
+    object-fit: cover;
+    display: block;
   }
 
   .remove-image {
-    margin-top: 0.5rem;
     width: 100%;
     background: #fff4f4;
     color: #c05050;
@@ -362,7 +422,6 @@
     cursor: pointer;
     transition: all 0.15s;
   }
-
   .remove-image:hover {
     background: #ffe0e0;
   }
@@ -403,6 +462,62 @@
     color: #1a1814;
   }
 
+  /* Modal Styles */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 2rem;
+    cursor: zoom-out;
+  }
+
+  .modal-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    cursor: default;
+  }
+
+  .modal-content img {
+    max-width: 100%;
+    max-height: 90vh;
+    display: block;
+    object-fit: contain;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .modal-close:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+
   @media (max-width: 900px) {
     form {
       flex-direction: column;
@@ -410,6 +525,20 @@
     .sidebar {
       width: 100%;
       order: -1;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .page-header h1 {
+      font-size: 1.5rem;
+    }
+
+    .card {
+      padding: 1rem;
+    }
+
+    .main-content {
+      gap: 1rem;
     }
   }
 </style>

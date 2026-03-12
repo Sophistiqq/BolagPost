@@ -1,10 +1,10 @@
-import db from '$lib/server/db';
+import db from '$lib/server/db-helper';
 import { fail } from '@sveltejs/kit';
 
 export const load = async ({ parent }) => {
   const { user } = await parent();
 
-  const posts = db.prepare(`
+  const posts = await db.prepare(`
     SELECT id, title, slug, created_at FROM post
     WHERE user_id = ?
     ORDER BY created_at DESC
@@ -21,12 +21,12 @@ export const actions = {
     if (!id || !locals.user) return fail(400, { error: 'Missing post ID' });
 
     // Make sure user owns this post
-    const post = db.prepare('SELECT id FROM post WHERE id = ? AND user_id = ?')
+    const post = await db.prepare('SELECT id FROM post WHERE id = ? AND user_id = ?')
       .get(id, locals.user.id);
 
     if (!post) return fail(403, { error: 'Not authorized' });
 
-    db.prepare('DELETE FROM post WHERE id = ?').run(id);
+    await db.prepare('DELETE FROM post WHERE id = ?').run(id);
     return { success: true };
   }
 };

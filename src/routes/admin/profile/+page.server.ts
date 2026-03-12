@@ -1,17 +1,17 @@
 import { fail, error } from '@sveltejs/kit';
-import db from '$lib/server/db';
+import db from '$lib/server/db-helper';
 
 export const load = async ({ locals }) => {
   if (!locals.user) throw error(401, 'Unauthorized');
-  
-  const profile: any = db.prepare('SELECT * FROM user WHERE id = ?').get(locals.user.id);
+
+  const profile: any = await db.prepare('SELECT * FROM user WHERE id = ?').get(locals.user.id);
   return { profile };
 };
 
 export const actions = {
   update: async ({ request, locals }) => {
     if (!locals.user) throw error(401, 'Unauthorized');
-    
+
     const data = await request.formData();
     const firstname = data.get('firstname')?.toString().trim() ?? '';
     const lastname = data.get('lastname')?.toString().trim() ?? '';
@@ -22,7 +22,7 @@ export const actions = {
     const confirmPassword = data.get('confirm_password')?.toString();
 
     // Update profile fields
-    db.prepare(`
+    await db.prepare(`
       UPDATE user SET firstname = ?, lastname = ?, email = ?, bio = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).run(firstname, lastname, email, bio, locals.user.id);
@@ -39,14 +39,14 @@ export const actions = {
         return fail(400, { error: 'New password must be at least 6 characters.' });
       }
 
-      const user: any = db.prepare('SELECT password_hash FROM user WHERE id = ?').get(locals.user.id);
+      const user: any = await db.prepare('SELECT password_hash FROM user WHERE id = ?').get(locals.user.id);
       const valid = await Bun.password.verify(currentPassword, user.password_hash);
       if (!valid) {
         return fail(400, { error: 'Current password is incorrect.' });
       }
 
       const newHash = await Bun.password.hash(newPassword);
-      db.prepare('UPDATE user SET password_hash = ? WHERE id = ?').run(newHash, locals.user.id);
+      await db.prepare('UPDATE user SET password_hash = ? WHERE id = ?').run(newHash, locals.user.id);
     }
 
     return { success: true };

@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import db from '$lib/server/db';
+import db from '$lib/server/db-helper';
 
 function calculateReadingTime(content: string): number {
   const wordsPerMinute = 200;
@@ -9,7 +9,7 @@ function calculateReadingTime(content: string): number {
 }
 
 export const load = async ({ params }) => {
-  const post: any = db.prepare(`
+  const post: any = await db.prepare(`
     SELECT p.id, p.title, p.slug, p.content, p.excerpt, p.featured_image, p.created_at, p.published_at, u.username as author
     FROM post p
     JOIN user u ON p.user_id = u.id
@@ -21,17 +21,17 @@ export const load = async ({ params }) => {
   }
 
   // Get tags for this post
-  const tags: any[] = db.prepare(`
+  const tags: any[] = await db.prepare(`
     SELECT t.name, t.slug FROM tag t
     JOIN post_tag pt ON t.id = pt.tag_id
     WHERE pt.post_id = ?
   `).all(post.id);
 
   // Increment view count
-  db.prepare('UPDATE post SET views = COALESCE(views, 0) + 1 WHERE id = ?').run(post.id);
+  await db.prepare('UPDATE post SET views = COALESCE(views, 0) + 1 WHERE id = ?').run(post.id);
 
   // Get updated view count
-  const updatedPost: any = db.prepare('SELECT views FROM post WHERE id = ?').get(post.id);
+  const updatedPost: any = await db.prepare('SELECT views FROM post WHERE id = ?').get(post.id);
 
   return {
     post: {

@@ -293,4 +293,21 @@
   .btn-primary:hover {
     background: #2e2a20;
   }
+  @media (max-width: 600px) {
+    .fields-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .page-header h1 {
+      font-size: 1.5rem;
+    }
+    
+    .form-footer {
+      justify-content: stretch;
+    }
+    
+    .btn-primary {
+      width: 100%;
+    }
+  }
 </style>

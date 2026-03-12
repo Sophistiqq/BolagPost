@@ -1,5 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
-import db from '$lib/server/db';
+import db from '$lib/server/db-helper';
 import { generateUniqueFilename, isValidImageType, getMaxFileSize } from '$lib/server/upload';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -22,7 +22,7 @@ export const actions = {
     }
 
     // Check slug is unique
-    const existing = db.prepare('SELECT id FROM post WHERE slug = ?').get(slug);
+    const existing = await db.prepare('SELECT id FROM post WHERE slug = ?').get(slug);
     if (existing) {
       return fail(400, { error: 'A post with this slug already exists.', title, slug, excerpt, tags, status });
     }
@@ -46,10 +46,19 @@ export const actions = {
 
     const publishedAt = status === 'published' ? new Date().toISOString() : null;
 
-    const result = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO post (title, slug, content, excerpt, featured_image, status, user_id, published_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(title, slug, content, excerpt || null, featuredImage, status, locals.user.id, publishedAt);
+    `).run(
+      title, 
+      slug, 
+      content, 
+      excerpt || undefined,  // Use undefined instead of null for libSQL
+      featuredImage || undefined, 
+      status, 
+      locals.user.id, 
+      publishedAt
+    );
 
     // Handle tags
     if (tags) {
@@ -58,15 +67,15 @@ export const actions = {
         const tagSlug = tagName.toLowerCase().replace(/[^\w-]/g, '').replace(/\s+/g, '-');
         
         // Insert tag if not exists
-        db.prepare(`
+        await db.prepare(`
           INSERT OR IGNORE INTO tag (name, slug) VALUES (?, ?)
         `).run(tagName, tagSlug);
 
         // Get tag id
-        const tag: any = db.prepare('SELECT id FROM tag WHERE slug = ?').get(tagSlug);
+        const tag: any = await db.prepare('SELECT id FROM tag WHERE slug = ?').get(tagSlug);
         if (tag) {
-          db.prepare('INSERT OR IGNORE INTO post_tag (post_id, tag_id) VALUES (?, ?)')
-            .run(result.lastInsertRowid, tag.id);
+          await db.prepare('INSERT OR IGNORE INTO post_tag (post_id, tag_id) VALUES (?, ?)')
+            .run(Number(result.lastInsertRowid), tag.id);
         }
       }
     }

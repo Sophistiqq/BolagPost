@@ -260,4 +260,30 @@
     border-radius: 4px;
     margin: 1.5rem 0;
   }
+  @media (max-width: 768px) {
+    .page-container {
+      padding: 2rem 1rem;
+    }
+
+    .post-detail {
+      padding: 1.5rem;
+    }
+
+    .featured-image {
+      margin: -1.5rem -1.5rem 1.5rem;
+    }
+
+    .post-header h1 {
+      font-size: 2rem;
+    }
+
+    .byline {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .separator {
+      display: none;
+    }
+  }
 </style>

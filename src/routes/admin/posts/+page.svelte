@@ -30,7 +30,7 @@
   {:else}
     <div class="post-list">
       {#each data.posts as post}
-        {@const p = post as Post}
+        {@const p = post as unknown as Post}
         <div class="post-row">
           <div class="post-info">
             <a href="/admin/posts/{p.id}/edit" class="post-title"
@@ -229,5 +229,28 @@
   .empty p {
     color: #8a7e6a;
     font-size: 0.95rem;
+  }
+  @media (max-width: 768px) {
+    .page-header h1 {
+      font-size: 1.5rem;
+    }
+
+    .post-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .post-actions {
+      width: 100%;
+      justify-content: flex-start;
+      border-top: 1px solid #f0ece4;
+      padding-top: 0.75rem;
+    }
+
+    .post-title {
+      white-space: normal;
+      font-size: 1rem;
+    }
   }
 </style>

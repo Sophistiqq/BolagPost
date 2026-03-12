@@ -70,7 +70,11 @@
     {/if}
   </main>
   
-  <a href="/login" class="admin-cta" title="Admin Login">⚙</a>
+  {#if data.user}
+    <a href="/admin/posts/new" class="admin-cta" title="New Post">✎</a>
+  {:else}
+    <a href="/login" class="admin-cta" title="Admin Login">⚙</a>
+  {/if}
 </div>
 
 <style>
@@ -277,5 +281,39 @@
     border: 1px dashed #e8e0d0;
     border-radius: 8px;
     color: #8a7e6a;
+  }
+  @media (max-width: 768px) {
+    .page-container {
+      padding: 3rem 1.25rem 5rem;
+    }
+
+    .blog-header {
+      margin-bottom: 3rem;
+    }
+
+    .blog-header h1 {
+      font-size: 2.5rem;
+    }
+
+    .post-feed {
+      gap: 3rem;
+    }
+
+    .post-card h2 {
+      font-size: 1.75rem;
+    }
+
+    .meta-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .admin-cta {
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 44px;
+      height: 44px;
+    }
   }
 </style>

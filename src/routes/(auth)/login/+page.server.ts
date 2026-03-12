@@ -1,6 +1,11 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { lucia } from '$lib/server/auth';
-import db from '$lib/server/db';
+import db from '$lib/server/db-helper';
+
+export const load = async ({ locals }) => {
+  if (locals.user) throw redirect(302, '/admin');
+  return {};
+};
 
 export const actions = {
   login: async ({ request, cookies }) => {
@@ -14,7 +19,7 @@ export const actions = {
     }
 
     // --- Look up user ---
-    const user: any = db.prepare('SELECT * FROM user WHERE username = ?').get(username);
+    const user: any = await db.prepare('SELECT * FROM user WHERE username = ?').get(username);
     if (!user) {
       // Generic message — don't reveal whether user exists
       return fail(400, { error: 'Incorrect username or password.', username });
