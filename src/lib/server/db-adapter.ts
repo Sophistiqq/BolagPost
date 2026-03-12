@@ -1,5 +1,6 @@
 import type { Adapter, DatabaseSession, DatabaseUser } from 'lucia';
-import type { Client } from '@libsql/client/web';
+import { type Client, createClient } from '@libsql/client';
+import { initDb } from './db';
 
 interface Tables {
   user: string;
@@ -24,6 +25,7 @@ export class TursoAdapter implements Adapter {
   }
 
   async deleteSession(sessionId: string): Promise<void> {
+    await initDb();
     await this.client.execute({
       sql: `DELETE FROM ${this.tables.session} WHERE id = ?`,
       args: [sessionId]
@@ -32,6 +34,7 @@ export class TursoAdapter implements Adapter {
   }
 
   async deleteUserSessions(userId: string): Promise<void> {
+    await initDb();
     await this.client.execute({
       sql: `DELETE FROM ${this.tables.session} WHERE user_id = ?`,
       args: [userId]
@@ -40,6 +43,7 @@ export class TursoAdapter implements Adapter {
   }
 
   async getSessionAndUser(sessionId: string): Promise<[session: DatabaseSession | null, user: DatabaseUser | null]> {
+    await initDb();
     // Check cache first
     const cached = this.sessionCache.get(sessionId);
     if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
@@ -85,6 +89,7 @@ export class TursoAdapter implements Adapter {
   }
 
   async getUserSessions(userId: string): Promise<DatabaseSession[]> {
+    await initDb();
     const result = await this.client.execute({
       sql: `SELECT * FROM ${this.tables.session} WHERE user_id = ?`,
       args: [userId]
@@ -99,6 +104,7 @@ export class TursoAdapter implements Adapter {
   }
 
   async setSession(session: DatabaseSession): Promise<void> {
+    await initDb();
     await this.client.execute({
       sql: `INSERT INTO ${this.tables.session} (id, user_id, expires_at) VALUES (?, ?, ?)`,
       args: [
@@ -113,6 +119,7 @@ export class TursoAdapter implements Adapter {
     sessionId: string,
     expiresAt: Date
   ): Promise<void> {
+    await initDb();
     await this.client.execute({
       sql: `UPDATE ${this.tables.session} SET expires_at = ? WHERE id = ?`,
       args: [Math.floor(expiresAt.getTime() / 1000), sessionId]
@@ -120,6 +127,7 @@ export class TursoAdapter implements Adapter {
   }
 
   async deleteExpiredSessions(): Promise<void> {
+    await initDb();
     const now = Math.floor(Date.now() / 1000);
     await this.client.execute({
       sql: `DELETE FROM ${this.tables.session} WHERE expires_at < ?`,

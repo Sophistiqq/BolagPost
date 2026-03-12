@@ -1,19 +1,22 @@
-import { getDb } from './db';
+import { getDb, initDb } from './db';
 
 export class Database {
   prepare(sql: string) {
     return {
       get: async (...params: any[]) => {
+        await initDb();
         const db = getDb();
         const result = await db.execute({ sql, args: params });
         return result.rows[0] || null;
       },
       all: async (...params: any[]) => {
+        await initDb();
         const db = getDb();
         const result = await db.execute({ sql, args: params });
         return result.rows;
       },
       run: async (...params: any[]) => {
+        await initDb();
         const db = getDb();
         // Convert undefined to null for libSQL compatibility
         const sanitizedParams = params.map(p => p === undefined ? null : p);
@@ -27,6 +30,7 @@ export class Database {
   }
 
   async exec(sql: string) {
+    await initDb();
     const db = getDb();
     await db.execute(sql);
   }
