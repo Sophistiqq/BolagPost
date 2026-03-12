@@ -10,6 +10,5 @@ export default defineConfig({
 		}
 	},
 	ssr: {
-		noExternal: []
-	}
-});
+	        noExternal: ['@vercel/blob', 'undici']
+	}});
