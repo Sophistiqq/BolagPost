@@ -12,7 +12,7 @@ export const load = async ({ params }) => {
   const post: any = await db.prepare(`
     SELECT p.id, p.title, p.slug, p.content, p.excerpt, p.featured_image, p.created_at, p.published_at, u.username as author
     FROM post p
-    JOIN user u ON p.user_id = u.id
+    JOIN "user" u ON p.user_id = u.id
     WHERE p.slug = ?
   `).get(params.slug);
 

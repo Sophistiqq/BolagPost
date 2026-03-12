@@ -19,7 +19,7 @@ export const actions = {
     }
 
     // --- Look up user ---
-    const user: any = await db.prepare('SELECT * FROM user WHERE username = ?').get(username);
+    const user: any = await db.prepare('SELECT * FROM "user" WHERE username = ?').get(username);
     if (!user) {
       // Generic message — don't reveal whether user exists
       return fail(400, { error: 'Incorrect username or password.', username });

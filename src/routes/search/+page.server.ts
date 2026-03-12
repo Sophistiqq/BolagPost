@@ -16,9 +16,8 @@ export const load = async ({ url }) => {
     posts = await db.prepare(`
       SELECT p.id, p.title, p.slug, p.excerpt, p.featured_image, p.content, p.created_at, p.published_at, u.username as author
       FROM post p
-      JOIN user u ON p.user_id = u.id
-      WHERE p.status = 'published'
-        AND (p.title LIKE ? OR p.excerpt LIKE ? OR p.content LIKE ?)
+      JOIN "user" u ON p.user_id = u.id
+      WHERE p.status = 'published'        AND (p.title LIKE ? OR p.excerpt LIKE ? OR p.content LIKE ?)
       ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
     `).all(`%${query}%`, `%${query}%`, `%${query}%`);
   }

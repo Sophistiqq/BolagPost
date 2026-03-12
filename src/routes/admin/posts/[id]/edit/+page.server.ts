@@ -1,8 +1,6 @@
 import { fail, error } from '@sveltejs/kit';
 import db from '$lib/server/db-helper';
-import { generateUniqueFilename, isValidImageType, getMaxFileSize } from '$lib/server/upload';
-import { writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { uploadToBlob, isValidImageType, getMaxFileSize } from '$lib/server/upload';
 
 export const load = async ({ params, locals }) => {
   if (!locals.user) throw error(401, 'Unauthorized');
@@ -72,11 +70,12 @@ export const actions = {
         return fail(400, { error: 'Image too large. Max 5MB.' });
       }
 
-      const filename = generateUniqueFilename(featuredImageFile.name);
-      const filepath = join(process.cwd(), 'static', 'uploads', filename);
-      const buffer = Buffer.from(await featuredImageFile.arrayBuffer());
-      await writeFile(filepath, buffer);
-      featuredImage = `/uploads/${filename}`;
+      try {
+        featuredImage = await uploadToBlob(featuredImageFile);
+      } catch (e) {
+        console.error('Upload failed:', e);
+        return fail(500, { error: 'Failed to upload image.' });
+      }
     }
 
     // Update post
@@ -104,13 +103,13 @@ export const actions = {
         
         // Insert tag if not exists
         await db.prepare(`
-          INSERT OR IGNORE INTO tag (name, slug) VALUES (?, ?)
+          INSERT INTO tag (name, slug) VALUES (?, ?) ON CONFLICT (slug) DO NOTHING
         `).run(tagName, tagSlug);
 
         // Get tag id
         const tag: any = await db.prepare('SELECT id FROM tag WHERE slug = ?').get(tagSlug);
         if (tag) {
-          await db.prepare('INSERT OR IGNORE INTO post_tag (post_id, tag_id) VALUES (?, ?)')
+          await db.prepare('INSERT INTO post_tag (post_id, tag_id) VALUES (?, ?) ON CONFLICT (post_id, tag_id) DO NOTHING')
             .run(params.id, tag.id);
         }
       }

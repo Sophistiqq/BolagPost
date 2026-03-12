@@ -1,8 +1,8 @@
 import { Lucia } from "lucia";
-import { TursoAdapter } from "./db-adapter";
+import { PostgresAdapter } from "./db-adapter";
 import { getDb } from "./db";
 
-const adapter = new TursoAdapter(getDb(), {
+const adapter = new PostgresAdapter(getDb(), {
   user: 'user',
   session: 'session'
 });

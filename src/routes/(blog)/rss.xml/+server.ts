@@ -4,7 +4,7 @@ export async function GET() {
   const posts: any[] = await db.prepare(`
     SELECT p.id, p.title, p.slug, p.excerpt, p.content, p.created_at, p.published_at, u.username as author
     FROM post p
-    JOIN user u ON p.user_id = u.id
+    JOIN "user" u ON p.user_id = u.id
     WHERE p.status = 'published'
     ORDER BY p.published_at DESC NULLS LAST, p.created_at DESC
     LIMIT 20

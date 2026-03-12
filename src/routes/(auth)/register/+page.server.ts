@@ -24,7 +24,7 @@ export const actions = {
     }
 
     // --- Check if username taken ---
-    const existing = await db.prepare('SELECT id FROM user WHERE username = ?').get(username);
+    const existing = await db.prepare('SELECT id FROM "user" WHERE username = ?').get(username);
     if (existing) {
       return fail(400, { error: 'Username already taken.', username });
     }
@@ -34,7 +34,7 @@ export const actions = {
     const userId = generateId(15);
 
     await db.prepare(
-      'INSERT INTO user (id, username, password_hash, email, firstname, lastname) VALUES (?, ?, ?, ?, ?, ?)'
+      'INSERT INTO "user" (id, username, password_hash, email, firstname, lastname) VALUES (?, ?, ?, ?, ?, ?)'
     ).run(userId, username, passwordHash, email ?? '', firstname ?? '', lastname ?? '');
 
     // --- Create session and log in immediately ---

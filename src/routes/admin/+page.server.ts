@@ -23,7 +23,7 @@ export const load = async ({ parent }) => {
   const { count: recentPosts }: any = await db.prepare(`
     SELECT COUNT(*) as count FROM post
     WHERE user_id = ?
-    AND created_at >= date('now', 'start of month')
+    AND created_at >= date_trunc('month', now())
   `).get(user.id);
 
   // Recent 5 posts

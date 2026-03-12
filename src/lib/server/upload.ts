@@ -1,3 +1,5 @@
+import { put } from '@vercel/blob';
+
 export function generateUniqueFilename(originalName: string): string {
   const ext = originalName.split('.').pop()?.toLowerCase() || 'jpg';
   const timestamp = Date.now();
@@ -11,4 +13,12 @@ export function isValidImageType(mimeType: string): boolean {
 
 export function getMaxFileSize(): number {
   return 5 * 1024 * 1024; // 5MB
+}
+
+export async function uploadToBlob(file: File): Promise<string> {
+  const filename = generateUniqueFilename(file.name);
+  const { url } = await put(filename, file, {
+    access: 'public',
+  });
+  return url;
 }
