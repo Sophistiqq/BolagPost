@@ -30,7 +30,6 @@
 		"@tiptap/extension-placeholder": "^3.20.1",
 		"@tiptap/pm": "^3.20.1",
 		"@tiptap/starter-kit": "^3.20.1",
-		"lucia": "^3.2.2",
-		"ws": "^8.19.0"
+		"lucia": "^3.2.2"
 	}
 }

@@ -14,7 +14,6 @@
         "@tiptap/pm": "^3.20.1",
         "@tiptap/starter-kit": "^3.20.1",
         "lucia": "^3.2.2",
-        "ws": "^8.19.0",
       },
       "devDependencies": {
         "@sveltejs/adapter-auto": "^7.0.0",
