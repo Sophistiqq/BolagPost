@@ -1,5 +1,19 @@
 import { fail, error } from '@sveltejs/kit';
 import db from '$lib/server/db-helper';
+import { scryptSync, randomBytes, timingSafeEqual } from 'node:crypto';
+
+function hashPassword(password: string): string {
+  const salt = randomBytes(16).toString('hex');
+  const hash = scryptSync(password, salt, 64).toString('hex');
+  return `${salt}:${hash}`;
+}
+
+function verifyPassword(password: string, storedHash: string): boolean {
+  const [salt, hash] = storedHash.split(':');
+  if (!salt || !hash) return false;
+  const buffer = scryptSync(password, salt, 64);
+  return timingSafeEqual(buffer, Buffer.from(hash, 'hex'));
+}
 
 export const load = async ({ locals }) => {
   if (!locals.user) throw error(401, 'Unauthorized');
@@ -40,12 +54,12 @@ export const actions = {
       }
 
       const user: any = await db.prepare('SELECT password_hash FROM "user" WHERE id = ?').get(locals.user.id);
-      const valid = await Bun.password.verify(currentPassword, user.password_hash);
+      const valid = verifyPassword(currentPassword, user.password_hash);
       if (!valid) {
         return fail(400, { error: 'Current password is incorrect.' });
       }
 
-      const newHash = await Bun.password.hash(newPassword);
+      const newHash = hashPassword(newPassword);
       await db.prepare('UPDATE "user" SET password_hash = ? WHERE id = ?').run(newHash, locals.user.id);
     }
 

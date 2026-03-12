@@ -1,12 +1,12 @@
-import { SQL } from "bun";
+import postgres from "postgres";
 
-let client: SQL;
+let client: postgres.Sql;
 let initialized = false;
 
 export function getDb() {
   if (!client) {
-    // Bun's built-in SQL for Postgres
-    client = new SQL(process.env.DATABASE_URL || "postgres://localhost/svelty");
+    // This works exactly like Bun SQL but on Node.js too!
+    client = postgres(process.env.DATABASE_URL || "postgres://localhost/svelty");
   }
   return client;
 }

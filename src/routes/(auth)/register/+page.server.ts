@@ -2,6 +2,14 @@ import { fail, redirect } from '@sveltejs/kit';
 import { lucia } from '$lib/server/auth';
 import db from '$lib/server/db-helper';
 import { generateId } from 'lucia';
+import { scryptSync, randomBytes, timingSafeEqual } from 'node:crypto';
+
+// Standard scrypt hashing for Node.js
+function hashPassword(password: string): string {
+  const salt = randomBytes(16).toString('hex');
+  const hash = scryptSync(password, salt, 64).toString('hex');
+  return `${salt}:${hash}`;
+}
 
 export const actions = {
   register: async ({ request, cookies }) => {
@@ -30,7 +38,7 @@ export const actions = {
     }
 
     // --- Hash password and create user ---
-    const passwordHash = await Bun.password.hash(password);
+    const passwordHash = hashPassword(password);
     const userId = generateId(15);
 
     await db.prepare(

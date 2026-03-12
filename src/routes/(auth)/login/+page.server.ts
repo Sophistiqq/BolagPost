@@ -1,6 +1,15 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { lucia } from '$lib/server/auth';
 import db from '$lib/server/db-helper';
+import { scryptSync, timingSafeEqual } from 'node:crypto';
+
+// Standard scrypt verification for Node.js
+function verifyPassword(password: string, storedHash: string): boolean {
+  const [salt, hash] = storedHash.split(':');
+  if (!salt || !hash) return false;
+  const buffer = scryptSync(password, salt, 64);
+  return timingSafeEqual(buffer, Buffer.from(hash, 'hex'));
+}
 
 export const load = async ({ locals }) => {
   if (locals.user) throw redirect(302, '/admin');
@@ -26,7 +35,7 @@ export const actions = {
     }
 
     // --- Check password ---
-    const validPassword = await Bun.password.verify(password, user.password_hash);
+    const validPassword = verifyPassword(password, user.password_hash);
     if (!validPassword) {
       return fail(400, { error: 'Incorrect username or password.', username });
     }

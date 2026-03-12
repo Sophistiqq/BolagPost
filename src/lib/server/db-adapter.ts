@@ -1,5 +1,4 @@
 import type { Adapter, DatabaseSession, DatabaseUser } from 'lucia';
-import { SQL } from "bun";
 import { initDb, getDb } from './db';
 
 interface Tables {
@@ -18,7 +17,7 @@ export class PostgresAdapter implements Adapter {
   private sessionCache: Map<string, SessionCache> = new Map();
   private readonly CACHE_TTL = 1000; // 1 second cache
 
-  constructor(client: SQL, tables: Tables) {
+  constructor(client: any, tables: Tables) {
     this.tables = {
         user: `"${tables.user}"`,
         session: `"${tables.session}"`
