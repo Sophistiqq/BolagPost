@@ -16,7 +16,6 @@
         "@types/better-sqlite3": "^7.6.13",
         "better-sqlite3": "^12.6.2",
         "lucia": "^3.2.2",
-        "ws": "^8.19.0",
       },
       "devDependencies": {
         "@sveltejs/adapter-auto": "^7.0.0",

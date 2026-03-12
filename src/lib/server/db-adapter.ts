@@ -1,5 +1,5 @@
 import type { Adapter, DatabaseSession, DatabaseUser } from 'lucia';
-import type { Client } from '@libsql/client';
+import type { Client } from '@libsql/client/http';
 
 interface Tables {
   user: string;
