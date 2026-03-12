@@ -1,4 +1,4 @@
-import { createClient, type Client } from '@libsql/client/http';
+import { createClient, type Client } from '@libsql/client/web';
 
 let client: Client;
 let initialized = false;
