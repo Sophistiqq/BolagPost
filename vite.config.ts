@@ -10,5 +10,5 @@ export default defineConfig({
 		}
 	},
 	ssr: {
-	        noExternal: ['@vercel/blob', 'undici']
+	        noExternal: ['@vercel/blob', 'undici', 'async-retry', 'is-buffer', 'is-node-process', 'throttleit']
 	}});
