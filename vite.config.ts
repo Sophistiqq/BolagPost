@@ -10,6 +10,6 @@ export default defineConfig({
 		}
 	},
 	ssr: {
-		noExternal: ['@libsql/client', 'ws', '@libsql/isomorphic-ws']
+		noExternal: ['@libsql/client', '@libsql/isomorphic-ws']
 	}
 });
