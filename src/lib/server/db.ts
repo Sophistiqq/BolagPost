@@ -1,4 +1,6 @@
-import { createClient, type Client } from '@libsql/client/http';
+import { createClient, type Client } from '@libsql/client/web';
+// Explicitly import ws to ensure it is bundled for Vercel
+import 'ws';
 
 let client: Client;
 
