@@ -1,20 +1,32 @@
 import postgres from "postgres";
 
 let client: postgres.Sql;
+let initializing = false;
 let initialized = false;
 
 export function getDb() {
   if (!client) {
-    // This works exactly like Bun SQL but on Node.js too!
-    client = postgres(process.env.DATABASE_URL || "postgres://localhost/svelty");
+    client = postgres(process.env.DATABASE_URL || "postgres://localhost/svelty", {
+      max: 10, // Use a pool
+      idle_timeout: 20,
+      connect_timeout: 10
+    });
   }
+  
+  // Background initialize if not done
+  if (!initialized && !initializing) {
+    initializing = true;
+    initDb().then(() => {
+        initialized = true;
+        initializing = false;
+    });
+  }
+  
   return client;
 }
 
 // Initialize database tables
 export async function initDb() {
-  if (initialized) return;
-  
   const sql = getDb();
   
   try {
@@ -75,8 +87,6 @@ export async function initDb() {
         PRIMARY KEY (post_id, tag_id)
       )
     `;
-    
-    initialized = true;
   } catch (e) {
     console.error('Failed to initialize database:', e);
   }

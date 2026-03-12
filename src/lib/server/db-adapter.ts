@@ -1,5 +1,5 @@
 import type { Adapter, DatabaseSession, DatabaseUser } from 'lucia';
-import { initDb, getDb } from './db';
+import { getDb } from './db';
 
 interface Tables {
   user: string;
@@ -25,21 +25,18 @@ export class PostgresAdapter implements Adapter {
   }
 
   async deleteSession(sessionId: string): Promise<void> {
-    await initDb();
     const sql = getDb();
     await sql.unsafe(`DELETE FROM ${this.tables.session} WHERE id = $1`, [sessionId]);
     this.sessionCache.delete(sessionId);
   }
 
   async deleteUserSessions(userId: string): Promise<void> {
-    await initDb();
     const sql = getDb();
     await sql.unsafe(`DELETE FROM ${this.tables.session} WHERE user_id = $1`, [userId]);
     this.sessionCache.clear();
   }
 
   async getSessionAndUser(sessionId: string): Promise<[session: DatabaseSession | null, user: DatabaseUser | null]> {
-    await initDb();
     const sql = getDb();
     
     // Check cache first
@@ -84,7 +81,6 @@ export class PostgresAdapter implements Adapter {
   }
 
   async getUserSessions(userId: string): Promise<DatabaseSession[]> {
-    await initDb();
     const sql = getDb();
     const rows = await sql.unsafe(`SELECT * FROM ${this.tables.session} WHERE user_id = $1`, [userId]);
 
@@ -97,7 +93,6 @@ export class PostgresAdapter implements Adapter {
   }
 
   async setSession(session: DatabaseSession): Promise<void> {
-    await initDb();
     const sql = getDb();
     await sql.unsafe(`INSERT INTO ${this.tables.session} (id, user_id, expires_at) VALUES ($1, $2, $3)`, [
       session.id,
@@ -110,13 +105,11 @@ export class PostgresAdapter implements Adapter {
     sessionId: string,
     expiresAt: Date
   ): Promise<void> {
-    await initDb();
     const sql = getDb();
     await sql.unsafe(`UPDATE ${this.tables.session} SET expires_at = $1 WHERE id = $2`, [expiresAt, sessionId]);
   }
 
   async deleteExpiredSessions(): Promise<void> {
-    await initDb();
     const sql = getDb();
     await sql.unsafe(`DELETE FROM ${this.tables.session} WHERE expires_at < NOW()`, []);
   }
